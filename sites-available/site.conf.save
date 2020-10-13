@@ -1,0 +1,43 @@
+server{
+    listen 80 default_server;
+    #имя сервера:
+    server_name mysite.com;
+
+ 
+
+    #логи
+    access_log /var/log/nginx/test.access.log;
+    error_log  /var/log/nginx/test.error.log;
+
+ 
+
+    # корневая директория
+    root /var/www/site;
+
+ 
+
+    location ~ \.php$ {
+        try_files $uri = 404;
+        include fastcgi_params;
+        fastcgi_pass  unix:/var/run/php/php7.4-fpm.sock;
+        fastcgi_index index.php;
+
+ 
+
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+    }
+
+    location / {
+                # This is cool because no php is touched for static content.
+                # include the "?$args" part so non-default permalinks doesn't break when using query string
+                try_files $uri $uri/ /index.php?$args;
+    } 
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+                expires max;
+                log_not_found off;
+        }
+    # порядок индексов    
+#    location /
+#    {
+#        index  index.php index.html index.htm;
+#    }
